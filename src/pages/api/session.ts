@@ -18,18 +18,18 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    res.setHeader(
-      "Set-Cookie",
-      serialize("token", "ddd", {
-        // httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      })
-    );
     api
       .post("/auth/login", req.body)
       .then(({ data }) => {
-        console.log({ data });
+        res.setHeader(
+          "Set-Cookie",
+          serialize("token", JSON.stringify(data.token), {
+            // httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+            path: "/",
+          })
+        );
         res.status(200).json(data);
       })
       .catch((err: AxiosError<any>) => {
