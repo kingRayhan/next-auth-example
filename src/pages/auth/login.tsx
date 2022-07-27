@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { api } from "../../app/api/client/api.client";
 
 interface LoginFormPayload {
@@ -53,8 +53,8 @@ const LoginPage = () => {
           // router.push("/");
         });
       },
-      onError: (error: any) => {
-        toast.error(error?.message);
+      onError: (error: AxiosError<{ message: string }>) => {
+        toast.error(error?.response?.data.message || "Login failed!");
       },
     }
   );
