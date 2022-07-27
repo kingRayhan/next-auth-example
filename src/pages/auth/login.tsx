@@ -1,12 +1,12 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import { signIn } from "@/app/auth";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import classNames from "classnames";
 import { useMutation } from "@tanstack/react-query";
-import toast from "react-hot-toast";
-import { useRouter } from "next/router";
 import axios, { AxiosError } from "axios";
+import classNames from "classnames";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import * as yup from "yup";
 import { api } from "../../app/api/client/api.client";
 
 interface LoginFormPayload {
@@ -23,35 +23,12 @@ const LoginPage = () => {
   const router = useRouter();
   const { mutate: mutate___login } = useMutation(
     async (payload: LoginFormPayload) => {
-      // const _fetch = await fetch("https://jwt-auth-api.vercel.app/auth/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(payload),
-      // });
-      // const _json = await _fetch.json();
-      // if (!_fetch.ok) {
-      //   return Promise.reject(_json);
-      // }
-      // return _json;
-
-      return axios.post("/api/session", payload);
+      return signIn(payload);
     },
     {
       onSuccess: async (data) => {
         toast.success("Login successful!");
-
-        const { data: _data } = await api.post("/auth/user", null, {
-          headers: {
-            Authorization: `Bearer ${data.data.token}`,
-          },
-        });
-
-        api.post("/api/session", { auth_uid: _data.user._id }).then((res) => {
-          console.log(res.data);
-          // router.push("/");
-        });
+        console.log("onSuccess", data);
       },
       onError: (error: AxiosError<{ message: string }>) => {
         toast.error(error?.response?.data.message || "Login failed!");
@@ -66,7 +43,7 @@ const LoginPage = () => {
   } = useForm<LoginFormPayload>({
     defaultValues: {
       email: "example@example.com",
-      password: "password",
+      password: "pa$$word",
     },
     resolver: yupResolver(validationSchema),
   });

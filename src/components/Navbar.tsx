@@ -9,7 +9,7 @@ const Navbar = () => {
       </Link>
 
       <nav>
-        <Link href="/api/auth/signin">
+        <Link href="/auth/login">
           <a className="capitalize">Login</a>
         </Link>
       </nav>
