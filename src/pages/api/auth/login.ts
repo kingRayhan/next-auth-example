@@ -2,6 +2,7 @@
 import { api } from "@/app/api/client/api.client";
 import { AxiosError } from "axios";
 import { serialize } from "cookie";
+import { deleteCookie, setCookie } from "cookies-next";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 type AuthSessionPayload = {
@@ -18,25 +19,27 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    console.log(req.body);
     api
       .post("/auth/login", req.body)
       .then(({ data }) => {
-        res.setHeader(
-          "Set-Cookie",
-          serialize("token", JSON.stringify(data.token), {
-            // httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            path: "/",
-          })
-        );
+        setCookie("token", JSON.stringify(data), {
+          path: "/",
+          req,
+          res,
+        });
         res.status(200).json(data);
       })
       .catch((err: AxiosError<any>) => {
         res.status(err.response?.status || 403).json({
-          message: err.response?.data.message || "Invalid credentials",
+          message: err.response?.data.message,
         });
       });
+  }
+
+  if (req.method === "DELETE") {
+    deleteCookie("token", {
+      path: "/",
+    });
+    res.status(200).json({ message: "User session removed" });
   }
 }
