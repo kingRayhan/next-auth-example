@@ -18,6 +18,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
+    console.log(req.body);
     api
       .post("/auth/login", req.body)
       .then(({ data }) => {
