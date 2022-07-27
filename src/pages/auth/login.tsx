@@ -36,7 +36,7 @@ const LoginPage = () => {
       // }
       // return _json;
 
-      return axios.post("https://jwt-auth-api.vercel.app/auth/login", payload);
+      return axios.post("/api/session", payload);
     },
     {
       onSuccess: async (data) => {

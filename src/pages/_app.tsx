@@ -1,3 +1,4 @@
+import { ExtendedAppProps } from "@/app/types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
@@ -13,7 +14,10 @@ export const reactQueryClient = new QueryClient({
   },
 });
 
-function MyApp({ Component, pageProps }: AppProps) {
+function RootApp({
+  Component,
+  pageProps: { session, ...pageProps },
+}: ExtendedAppProps) {
   return (
     <QueryClientProvider client={reactQueryClient}>
       <div className="max-w-3xl mx-auto">
@@ -26,4 +30,4 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default MyApp;
+export default RootApp;

@@ -1,13 +1,4 @@
-import React, { useEffect } from "react";
-
 const HomePage = () => {
-  useEffect(() => {
-    fetch("/api/session")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      });
-  }, []);
   return (
     <div>
       <p>

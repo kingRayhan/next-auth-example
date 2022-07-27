@@ -1,8 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://jwt-auth-api.vercel.app",
-  //   withCredentials: true,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
