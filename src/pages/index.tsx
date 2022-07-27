@@ -1,20 +1,12 @@
-import { api } from "@/app/api/client/api.client";
-import { useEffect } from "react";
+import { getSession } from "@/app/auth/getSession";
+import { GetServerSidePropsContext } from "next";
 
-const HomePage = () => {
-  useEffect(() => {
-    api
-      .get("/auth/me")
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }, []);
-
+const HomePage = ({ user }: { user: any }) => {
   return (
     <div>
+      <pre>
+        <code>{JSON.stringify(user, null, 2)}</code>
+      </pre>
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium
         possimus ipsam laudantium ducimus aspernatur natus, quos unde quibusdam
@@ -24,5 +16,15 @@ const HomePage = () => {
     </div>
   );
 };
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const { user } = await getSession(context);
 
+  return {
+    props: {
+      user,
+    },
+  };
+};
 export default HomePage;

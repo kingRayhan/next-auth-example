@@ -17,4 +17,16 @@ export const signIn = (credential: Credential) => {
       });
   });
 };
-export const signOut = () => {};
+
+export const signOut = () => {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete("/api/token")
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+};
