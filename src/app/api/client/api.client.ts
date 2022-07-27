@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCookie, deleteCookie } from "cookies-next";
+import { getCookie } from "cookies-next";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "https://jwt-auth-api.vercel.app",
