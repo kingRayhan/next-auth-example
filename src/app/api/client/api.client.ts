@@ -12,12 +12,13 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     if (Boolean(getCookie("token"))) {
-      const _token = JSON.parse(getCookie("token") as string) || null;
+      const { token } = JSON.parse(getCookie("token") as string) || null;
+      console.log("request", getCookie("token"));
       return {
         ...config,
         headers: {
           ...config.headers,
-          Authorization: `Bearer ${_token.accessToken}`,
+          Authorization: `Bearer ${token.accessToken}`,
         },
       };
     }
@@ -26,35 +27,43 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (config) => {
-//     const _request = config.config;
-//     const _response = config.response;
-//     if (_response?.status === 401 && Boolean(getCookie("token"))) {
-//       try {
-//         const _refreshResponse = await api.post("/auth/refresh");
-//       } catch (error) {
-//         deleteCookie("token", {
-//           path: "/",
-//           domain: "localhost",
-//         });
-//       }
-//     }
-//     // const _token = JSON.parse(token as string) || null;
-//     // if (status === 401 && _token.refreshToken) {
-//     //   try {
-//     //     const _refreshResponse = await axios.post("/auth/refresh", null, {
-//     //       headers: {
-//     //         Authorization: `Bearer ${_token.refreshToken}`,
-//     //       },
-//     //     });
-//     //     console.log({ _refreshResponse });
-//     //   } catch (error) {
-//     //     console.log("delete cookie");
-//     //     deleteCookie("token");
-//     //   }
-//     // }
-//     return config;
-//   }
-// );
+api.interceptors.response.use(
+  (response) => response,
+  async (config) => {
+    const _request = config.config;
+    const _response = config.response;
+    if (
+      (_response?.status === 401 || _response?.status === 403) &&
+      Boolean(getCookie("token"))
+    ) {
+      try {
+        const { token } = JSON.parse(getCookie("token") as string) || null;
+        console.log("refreshing...", { token });
+
+        const _refreshResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${token.refreshToken}`,
+            },
+          }
+        );
+
+        await axios.post("/api/auth/token", _refreshResponse.data);
+
+        return api({
+          ..._request,
+          headers: {
+            ..._request.headers,
+          },
+        });
+      } catch (error) {
+        console.log("refreshing... error", error);
+        await axios.delete("/api/auth/token");
+        return Promise.reject(error);
+      }
+    }
+    return config;
+  }
+);

@@ -35,11 +35,4 @@ export default async function handler(
         });
       });
   }
-
-  if (req.method === "DELETE") {
-    deleteCookie("token", {
-      path: "/",
-    });
-    res.status(200).json({ message: "User session removed" });
-  }
 }
