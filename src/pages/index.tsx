@@ -1,11 +1,26 @@
+import { api } from "@/app/api/client/api.client";
 import { getSession } from "@/app/auth/getSession";
+import { getCookie } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
+import { useEffect, useState } from "react";
 
-const HomePage = ({ user }: { user: any }) => {
+interface Props {
+  user: any;
+  isAuthenticated: boolean;
+}
+
+const HomePage: React.FC<Props> = ({ user, isAuthenticated }) => {
+  // const [user, setUser] = useState(null);
+  // useEffect(() => {
+  //   api.get("/auth/me").then((res) => {
+  //     setUser(res.data);
+  //   });
+  // }, []);
+
   return (
     <div>
       <pre>
-        <code>{JSON.stringify(user, null, 2)}</code>
+        <code>{JSON.stringify({ user }, null, 2)}</code>
       </pre>
       <p>
         Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium
@@ -19,11 +34,12 @@ const HomePage = ({ user }: { user: any }) => {
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { user } = await getSession(context);
+  const { user, isAuthenticated } = await getSession(context);
 
   return {
     props: {
       user,
+      isAuthenticated,
     },
   };
 };

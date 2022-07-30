@@ -10,22 +10,25 @@ export interface Session {
 export const getSession = async (
   context: GetServerSidePropsContext
 ): Promise<Session> => {
-  const _token = getCookie("token", { req: context.req, res: context.res });
-  if (!_token) {
+  const __token = getCookie("token", { req: context.req, res: context.res });
+  let token = null;
+
+  if (!__token) {
     return { isAuthenticated: false, user: null };
   }
 
-  console.log({ _token });
+  if (__token) {
+    const { token: tokenObject } = JSON.parse(
+      getCookie("token", { req: context.req, res: context.res }) as string
+    );
+    token = tokenObject;
+  }
 
   try {
     const res = await api.get("/auth/me", {
-      headers: {
-        // @ts-ignore
-        Authorization: `Bearer ${_token.accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${token.accessToken}` },
     });
-    // console.log("getSession", res);
-    return { isAuthenticated: true, user: "data" };
+    return { isAuthenticated: true, user: res.data };
   } catch (error) {
     return { isAuthenticated: false, user: null };
   }
